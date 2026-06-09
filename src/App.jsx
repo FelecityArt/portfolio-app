@@ -390,8 +390,9 @@ const INPUT_CLS = 'w-full bg-[#121212] border border-[#353534] rounded-lg px-3 p
 const LABEL_CLS = 'block text-xs text-[#8e9192] uppercase tracking-widest mb-1'
 const ERR_CLS = 'text-xs text-red-400 mt-1'
 
+const BLANK = { name: '', role: '', email: '', message: '' }
+
 function TestimonialModal({ onClose }) {
-  const BLANK = { name: '', role: '', email: '', message: '' }
   const [fields, setFields] = React.useState(BLANK)
   const [photoPreview, setPhotoPreview] = React.useState(null)
   const [photoBase64, setPhotoBase64] = React.useState('')
@@ -418,9 +419,17 @@ function TestimonialModal({ onClose }) {
   async function handlePhotoChange(e) {
     const file = e.target.files[0]
     if (!file) return
-    const b64 = await compressImage(file)
-    setPhotoPreview(b64)
-    setPhotoBase64(b64)
+    if (!file.type.startsWith('image/')) {
+      setErrors((prev) => ({ ...prev, photo: 'Please select an image file.' }))
+      return
+    }
+    try {
+      const b64 = await compressImage(file)
+      setPhotoPreview(b64)
+      setPhotoBase64(b64)
+    } catch {
+      setErrors((prev) => ({ ...prev, photo: 'Could not read image. Try another file.' }))
+    }
   }
 
   async function handleSubmit(e) {
@@ -478,25 +487,25 @@ function TestimonialModal({ onClose }) {
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
             <label className={LABEL_CLS}>Name</label>
-            <input type="text" value={fields.name} onChange={set('name')} className={INPUT_CLS} placeholder="Your name" />
+            <input type="text" value={fields.name} onChange={set('name')} className={INPUT_CLS} placeholder="Your name" maxLength={80} />
             {errors.name && <p className={ERR_CLS}>{errors.name}</p>}
           </div>
 
           <div>
             <label className={LABEL_CLS}>Role</label>
-            <input type="text" value={fields.role} onChange={set('role')} className={INPUT_CLS} placeholder="Your role or title" />
+            <input type="text" value={fields.role} onChange={set('role')} className={INPUT_CLS} placeholder="Your role or title" maxLength={80} />
             {errors.role && <p className={ERR_CLS}>{errors.role}</p>}
           </div>
 
           <div>
             <label className={LABEL_CLS}>Email</label>
-            <input type="email" value={fields.email} onChange={set('email')} className={INPUT_CLS} placeholder="your@email.com" />
+            <input type="email" value={fields.email} onChange={set('email')} className={INPUT_CLS} placeholder="your@email.com" maxLength={120} />
             {errors.email && <p className={ERR_CLS}>{errors.email}</p>}
           </div>
 
           <div>
             <label className={LABEL_CLS}>Testimonial</label>
-            <textarea rows={4} value={fields.message} onChange={set('message')} className={INPUT_CLS} placeholder="Share your experience…" />
+            <textarea rows={4} value={fields.message} onChange={set('message')} className={INPUT_CLS} placeholder="Share your experience…" maxLength={1000} />
             {errors.message && <p className={ERR_CLS}>{errors.message}</p>}
           </div>
 
@@ -511,6 +520,7 @@ function TestimonialModal({ onClose }) {
             {photoPreview && (
               <img src={photoPreview} alt="Preview" className="mt-2 w-12 h-12 rounded-lg object-cover grayscale" />
             )}
+            {errors.photo && <p className={ERR_CLS}>{errors.photo}</p>}
           </div>
 
           {status === 'error' && <p className={ERR_CLS}>{errorMsg}</p>}
