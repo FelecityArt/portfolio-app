@@ -30,7 +30,7 @@ const AVT_SARAH    = 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 function compressImage(file, maxBytes = 500_000) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = (e) => {
       const img = new Image()
@@ -42,8 +42,10 @@ function compressImage(file, maxBytes = 500_000) {
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
         resolve(canvas.toDataURL('image/jpeg', 0.8))
       }
+      img.onerror = () => reject(new Error('Failed to load image'))
       img.src = e.target.result
     }
+    reader.onerror = () => reject(new Error('Failed to read file'))
     reader.readAsDataURL(file)
   })
 }
