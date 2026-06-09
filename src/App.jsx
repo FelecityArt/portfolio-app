@@ -539,6 +539,7 @@ function TestimonialModal({ onClose }) {
 }
 
 function Testimonials() {
+  const [showForm, setShowForm] = React.useState(false)
   return (
     <div>
       <SectionTitle>Testimonials.</SectionTitle>
@@ -560,6 +561,13 @@ function Testimonials() {
           </div>
         ))}
       </div>
+      <button
+        onClick={() => setShowForm(true)}
+        className="mt-6 text-xs text-[#8e9192] underline underline-offset-2 hover:text-white transition-colors"
+      >
+        Leave a testimonial
+      </button>
+      {showForm && <TestimonialModal onClose={() => setShowForm(false)} />}
     </div>
   )
 }
