@@ -2,6 +2,7 @@ import React from 'react'
 import './index.css'
 import DotField from './DotField'
 import { motion, useAnimationFrame, useMotionValue } from 'framer-motion'
+import emailjs from '@emailjs/browser'
 import myPic from './assets/images/my_pic.png'
 
 /* ─── Image constants ─────────────────────────────────────── */
@@ -384,6 +385,148 @@ const TESTIMONIALS = [
     quote: '"Kima has an incredible eye for detail and a clear understanding of how design should function, not just look good. The final result exceeded our expectations."',
   },
 ]
+
+const INPUT_CLS = 'w-full bg-[#121212] border border-[#353534] rounded-lg px-3 py-2 text-sm text-white placeholder-[#8e9192] focus:outline-none focus:border-white transition-colors'
+const LABEL_CLS = 'block text-xs text-[#8e9192] uppercase tracking-widest mb-1'
+const ERR_CLS = 'text-xs text-red-400 mt-1'
+
+function TestimonialModal({ onClose }) {
+  const BLANK = { name: '', role: '', email: '', message: '' }
+  const [fields, setFields] = React.useState(BLANK)
+  const [photoPreview, setPhotoPreview] = React.useState(null)
+  const [photoBase64, setPhotoBase64] = React.useState('')
+  const [errors, setErrors] = React.useState({})
+  const [status, setStatus] = React.useState('idle')
+  const [errorMsg, setErrorMsg] = React.useState('')
+
+  React.useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  function validate() {
+    const errs = {}
+    if (!fields.name.trim()) errs.name = 'Required'
+    if (!fields.role.trim()) errs.role = 'Required'
+    if (!fields.email.trim()) errs.email = 'Required'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) errs.email = 'Invalid email'
+    if (!fields.message.trim()) errs.message = 'Required'
+    return errs
+  }
+
+  async function handlePhotoChange(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    const b64 = await compressImage(file)
+    setPhotoPreview(b64)
+    setPhotoBase64(b64)
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    const errs = validate()
+    if (Object.keys(errs).length) { setErrors(errs); return }
+    setErrors({})
+    setStatus('sending')
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          from_name: fields.name,
+          from_role: fields.role,
+          from_email: fields.email,
+          message: fields.message,
+          photo_base64: photoBase64,
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      )
+      setStatus('success')
+    } catch {
+      setErrorMsg('Something went wrong. Please try again.')
+      setStatus('error')
+    }
+  }
+
+  const set = (key) => (e) => setFields((f) => ({ ...f, [key]: e.target.value }))
+
+  if (status === 'success') {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+        <div className="bg-[#1e1e1e] border border-[#353534] rounded-xl p-8 w-full max-w-md mx-4 text-center" onClick={(e) => e.stopPropagation()}>
+          <p className="text-white text-sm mb-6">Thanks! I'll be in touch.</p>
+          <button onClick={onClose} className="bg-white text-[#121212] px-6 py-2.5 rounded-full font-semibold text-sm transition-transform hover:scale-105 active:scale-95">
+            Close
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-[#1e1e1e] border border-[#353534] rounded-xl p-8 w-full max-w-md mx-4 relative max-h-[90vh] overflow-y-auto no-scrollbar" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-7 h-7 rounded-full bg-[#1e1e1e] border border-[#353534] flex items-center justify-center text-[#e5e2e1] hover:bg-[#2a2a2a] transition-colors text-sm"
+          aria-label="Close"
+        >×</button>
+
+        <h3 className="text-white text-base font-medium mb-6">Leave a testimonial</h3>
+
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <div>
+            <label className={LABEL_CLS}>Name</label>
+            <input type="text" value={fields.name} onChange={set('name')} className={INPUT_CLS} placeholder="Your name" />
+            {errors.name && <p className={ERR_CLS}>{errors.name}</p>}
+          </div>
+
+          <div>
+            <label className={LABEL_CLS}>Role</label>
+            <input type="text" value={fields.role} onChange={set('role')} className={INPUT_CLS} placeholder="Your role or title" />
+            {errors.role && <p className={ERR_CLS}>{errors.role}</p>}
+          </div>
+
+          <div>
+            <label className={LABEL_CLS}>Email</label>
+            <input type="email" value={fields.email} onChange={set('email')} className={INPUT_CLS} placeholder="your@email.com" />
+            {errors.email && <p className={ERR_CLS}>{errors.email}</p>}
+          </div>
+
+          <div>
+            <label className={LABEL_CLS}>Testimonial</label>
+            <textarea rows={4} value={fields.message} onChange={set('message')} className={INPUT_CLS} placeholder="Share your experience…" />
+            {errors.message && <p className={ERR_CLS}>{errors.message}</p>}
+          </div>
+
+          <div>
+            <label className={LABEL_CLS}>Photo (optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              className="w-full text-xs text-[#8e9192] file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border file:border-[#353534] file:text-xs file:font-medium file:bg-[#121212] file:text-white hover:file:bg-[#2a2a2a] file:transition-colors cursor-pointer"
+            />
+            {photoPreview && (
+              <img src={photoPreview} alt="Preview" className="mt-2 w-12 h-12 rounded-lg object-cover grayscale" />
+            )}
+          </div>
+
+          {status === 'error' && <p className={ERR_CLS}>{errorMsg}</p>}
+
+          <button
+            type="submit"
+            disabled={status === 'sending'}
+            className="bg-white text-[#121212] px-6 py-2.5 rounded-full font-semibold text-sm transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            {status === 'sending' ? 'Sending…' : 'Send testimonial'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
 
 function Testimonials() {
   return (
