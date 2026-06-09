@@ -30,7 +30,7 @@ const AVT_MICHAEL  = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67
 const AVT_SARAH    = 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&auto=format&q=80&sat=-100'
 
 /* ─── Helpers ─────────────────────────────────────────────── */
-function compressImage(file, maxBytes = 500_000) {
+function compressImage(file, maxBytes = 30_000) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -41,7 +41,13 @@ function compressImage(file, maxBytes = 500_000) {
         canvas.width = Math.round(img.width * scale)
         canvas.height = Math.round(img.height * scale)
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
-        resolve(canvas.toDataURL('image/jpeg', 0.8))
+        let quality = 0.8
+        let dataUrl = canvas.toDataURL('image/jpeg', quality)
+        while (dataUrl.length > maxBytes * 1.37 && quality > 0.1) {
+          quality -= 0.1
+          dataUrl = canvas.toDataURL('image/jpeg', quality)
+        }
+        resolve(dataUrl)
       }
       img.onerror = () => reject(new Error('Failed to load image'))
       img.src = e.target.result
@@ -486,32 +492,33 @@ function TestimonialModal({ onClose }) {
 
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
-            <label className={LABEL_CLS}>Name</label>
-            <input type="text" value={fields.name} onChange={set('name')} className={INPUT_CLS} placeholder="Your name" maxLength={80} />
+            <label htmlFor="t-name" className={LABEL_CLS}>Name</label>
+            <input id="t-name" type="text" value={fields.name} onChange={set('name')} className={INPUT_CLS} placeholder="Your name" maxLength={80} />
             {errors.name && <p className={ERR_CLS}>{errors.name}</p>}
           </div>
 
           <div>
-            <label className={LABEL_CLS}>Role</label>
-            <input type="text" value={fields.role} onChange={set('role')} className={INPUT_CLS} placeholder="Your role or title" maxLength={80} />
+            <label htmlFor="t-role" className={LABEL_CLS}>Role</label>
+            <input id="t-role" type="text" value={fields.role} onChange={set('role')} className={INPUT_CLS} placeholder="Your role or title" maxLength={80} />
             {errors.role && <p className={ERR_CLS}>{errors.role}</p>}
           </div>
 
           <div>
-            <label className={LABEL_CLS}>Email</label>
-            <input type="email" value={fields.email} onChange={set('email')} className={INPUT_CLS} placeholder="your@email.com" maxLength={120} />
+            <label htmlFor="t-email" className={LABEL_CLS}>Email</label>
+            <input id="t-email" type="email" value={fields.email} onChange={set('email')} className={INPUT_CLS} placeholder="your@email.com" maxLength={120} />
             {errors.email && <p className={ERR_CLS}>{errors.email}</p>}
           </div>
 
           <div>
-            <label className={LABEL_CLS}>Testimonial</label>
-            <textarea rows={4} value={fields.message} onChange={set('message')} className={INPUT_CLS} placeholder="Share your experience…" maxLength={1000} />
+            <label htmlFor="t-message" className={LABEL_CLS}>Testimonial</label>
+            <textarea id="t-message" rows={4} value={fields.message} onChange={set('message')} className={INPUT_CLS} placeholder="Share your experience…" maxLength={1000} />
             {errors.message && <p className={ERR_CLS}>{errors.message}</p>}
           </div>
 
           <div>
-            <label className={LABEL_CLS}>Photo (optional)</label>
+            <label htmlFor="t-photo" className={LABEL_CLS}>Photo (optional)</label>
             <input
+              id="t-photo"
               type="file"
               accept="image/*"
               onChange={handlePhotoChange}
