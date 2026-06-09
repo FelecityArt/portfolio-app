@@ -1,9 +1,11 @@
 import React from 'react'
 import './index.css'
 import DotField from './DotField'
+import { motion, useAnimationFrame, useMotionValue } from 'framer-motion'
+import myPic from './assets/images/my_pic.png'
 
 /* ─── Image constants ─────────────────────────────────────── */
-const AVATAR      = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDddpUalbb5W1uay8a-56UOoy0jSZ2LapfPI_MXE6a69xHQW9lh16deHQ2phDDtBpDtSqPVtiesojedmqX4R89gl5vw_yLvy3jqJE7e77cgwtuY8tJMmUQ3MN17iqAyavyhKLW9so1mLrmz5V6TzMMU-mvVuW6e93_Gwl3hOc7KkBb3yNxdLeEqNpr-OFCr1ARA95ynMM4LMzYr6rKzKmEQbGrbTj5cnwARrFiLqkwFzobBpfLMtRVZrvGvvyvKUa2pIrovzN5LTTiE'
+const AVATAR      = myPic
 const IMG_PORTRAIT = 'https://lh3.googleusercontent.com/aida-public/AB6AXuCF5NaZ_avrxlFFT6VYLnNvBhHnan9iJDj6t4Ihtom4SXX58602yNIOEnnq6P3xpC5tJbH7hE6gYVCq-hLTVMdwEmzwejvs9JqI05qbyHnMIYLCYoj4FKwuR5HUhrvhF_B77yh1O6QN9cCbSti_4K8u_yGhH3Q0CzCNhScxwI-1EWNyQt3V2WVBAI68lT7lMV74Sd3CV6_xIWHIONWuvVY1boXf_kuQw2k1EytayEf4BN6TYQU1OWNeRs3KEdDIuiUeqJTl2GfIIUw7'
 const IMG_MISC     = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAlFnJ_PfpTXN6t_xe3KqzH4HVVSRqg3VWfE-SDgAR_eiOc1_byZTLtb65pILrdRBmg-a3wuvZZ4qiL0wAJeu7GJ8dG9nXag7n4aBLWM8zDvOhfbiT_wU_8dBQvH9q_VH5GCUhAjl9zNVS7H_O_Wpl59ugxX1XfgQNTsURlQBAhGBh2ah1g_3KZyzmWefBngKcQthmzeRvLRi279zwpkvmsoNgHrY_hkbR1cGEHIL2A5CnyeOm5StCq2v_apIbSVT5v0IU4QA9rBEOo'
 const IMG_VASE     = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAEVQEsuBYNBmaVxrA1pgB5TE2VU2rVMN01y5yJiQPMSJN9QZEraDh_mJC7SBTXZGlmJxHZ4sGLl0XN2YtfvGSaI0yPRPp5ONWatoMjyq-ddKu-lxFqxEhL2pbRU_9mVn52VxrQ7wdwJqrWwCa0Gok4c4FOsD7DDsmH6GCCS3rgPOvy8NjWxzged7H4h-PnRv_4R3CSIMwyioJOthw1kt3-AnQRiPJLbTl6A4p24PwkI-bRK01AIYCTRRnAfeeDfQg_cz8mr5ZavWPu'
@@ -26,9 +28,29 @@ const AVT_DANIEL   = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f
 const AVT_MICHAEL  = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=80&h=80&fit=crop&auto=format&q=80&sat=-100'
 const AVT_SARAH    = 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&auto=format&q=80&sat=-100'
 
+/* ─── Helpers ─────────────────────────────────────────────── */
+function compressImage(file, maxBytes = 500_000) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const scale = Math.min(1, Math.sqrt(maxBytes / file.size))
+        canvas.width = Math.round(img.width * scale)
+        canvas.height = Math.round(img.height * scale)
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', 0.8))
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
 /* ─── Reusable components ─────────────────────────────────── */
 function Divider() {
-  return <div className="border-t border-[#353534] my-10" />
+  return <div className="border-t border-[#353534] my-10" style={{ marginRight: '-3rem' }} />
 }
 
 function SectionTitle({ children }) {
@@ -53,25 +75,65 @@ function GalleryImage({ src, alt, label, className = '' }) {
 }
 
 /* ─── Sidebar sections ────────────────────────────────────── */
-function ProfileHeader() {
+function ProfilePicModal({ onClose }) {
+  React.useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
   return (
-    <div className="flex items-center gap-4 mb-10">
-      <img src={AVATAR} alt="Kima Davidson" className="avatar-frame" />
-      <div>
-        <h1 className="text-lg font-medium leading-tight text-white">Kima Davidson</h1>
-        <p className="text-[#8e9192] text-sm">Digital Designer</p>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <img
+          src={AVATAR}
+          alt="Felecia Kenton"
+          className="w-72 h-72 object-cover rounded-xl shadow-2xl"
+        />
+        <button
+          onClick={onClose}
+          className="absolute -top-3 -right-3 w-7 h-7 rounded-full bg-[#1e1e1e] border border-[#353534] flex items-center justify-center text-[#e5e2e1] hover:bg-[#2a2a2a] transition-colors text-sm"
+          aria-label="Close"
+        >×</button>
       </div>
     </div>
+  )
+}
+
+function ProfileHeader() {
+  const [open, setOpen] = React.useState(false)
+  return (
+    <>
+      <div className="flex items-center gap-4 mb-10">
+        <img
+          src={AVATAR}
+          alt="Felecia Kenton"
+          className="avatar-frame cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => setOpen(true)}
+        />
+        <div>
+          <h1 className="text-lg font-medium leading-tight text-white">Felecia Kenton</h1>
+          <p className="text-[#8e9192] text-sm">Software Engineer · Graphic Designer · Photographer</p>
+        </div>
+      </div>
+      {open && <ProfilePicModal onClose={() => setOpen(false)} />}
+    </>
   )
 }
 
 function Bio() {
   return (
     <div className="mb-8">
-      <p className="text-2xl md:text-3xl leading-snug tracking-tight">
-        I <span className="text-white">design digital experiences</span> — from modern websites
-        and visual identities and graphic design —{' '}
-        <span className="text-[#8e9192]">focused on clarity, usability, and strong visual storytelling.</span>
+      <p className="text-[20px] leading-snug tracking-tight">
+        I <span className="text-white">build, design, and capture.</span> Full-stack software,
+        graphic design, and photography,{' '}
+        <span className="text-[#8e9192]">all driven by the same thing: making something that looks good and works even better.</span>
       </p>
     </div>
   )
@@ -90,7 +152,7 @@ function CTAButton() {
   return (
     <div className="mb-10">
       <a
-        href="mailto:hello@kimadavidson.design"
+        href="mailto:kentonfelecia123@gmail.com"
         className="inline-block bg-white text-[#121212] px-6 py-2.5 rounded-full font-semibold text-sm transition-transform hover:scale-105 active:scale-95"
       >
         Get in touch
@@ -100,13 +162,43 @@ function CTAButton() {
 }
 
 function ClientLogos() {
+  const items = ['·', 'FELECITYART', '·', 'FULL-STACK DEV', '·', 'GRAPHIC DESIGN', '·', 'PHOTOGRAPHY']
+  const spanStyle = (item) => ({
+    fontSize: '1.25rem',
+    fontWeight: 900,
+    letterSpacing: '0.1em',
+    color: 'white',
+    opacity: item === '·' ? 0.25 : 0.5,
+    margin: '0 1.25rem',
+    WebkitTextStroke: '0.5px white',
+    lineHeight: 1,
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  })
+
+  const x = useMotionValue(0)
+  const groupRef = React.useRef(null)
+
+  useAnimationFrame((_, delta) => {
+    if (!groupRef.current) return
+    const groupWidth = groupRef.current.offsetWidth
+    if (!groupWidth) return
+    let next = x.get() - (delta * 0.055)
+    if (next <= -groupWidth) next += groupWidth
+    x.set(next)
+  })
+
   return (
-    <div className="border-t border-b border-[#353534] py-7 mb-8">
-      <div className="flex justify-between items-center opacity-50 grayscale contrast-125">
-        <span className="text-sm font-black tracking-widest text-white">IPSUM</span>
-        <span className="text-sm font-bold tracking-tighter text-white">LOOO</span>
-        <span className="text-sm font-bold italic text-white">L.||||</span>
-        <span className="w-6 h-4 bg-white/60 skew-x-[-20deg]" />
+    <div style={{ borderTop: '1px solid #353534', borderBottom: '1px solid #353534', marginBottom: '56px', marginTop: '8px', marginRight: '-3rem' }}>
+      <div style={{ overflow: 'hidden', paddingTop: '60px', paddingBottom: '60px', maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)' }}>
+        <motion.div style={{ x, display: 'flex', whiteSpace: 'nowrap' }}>
+          <div ref={groupRef} style={{ display: 'flex', flexShrink: 0 }}>
+            {items.map((name, i) => <span key={i} style={spanStyle(name)}>{name}</span>)}
+          </div>
+          <div aria-hidden style={{ display: 'flex', flexShrink: 0 }}>
+            {items.map((name, i) => <span key={`d${i}`} style={spanStyle(name)}>{name}</span>)}
+          </div>
+        </motion.div>
       </div>
     </div>
   )
@@ -115,17 +207,18 @@ function ClientLogos() {
 function About() {
   return (
     <div>
-      <SectionTitle>About me.</SectionTitle>
+      <h2 className="text-lg font-medium text-white mb-2">About me.</h2>
       <p className="text-[#8e9192] text-sm leading-relaxed mb-8">
-        I'm Kima Davidson, a digital designer based in New York with over 11 years of experience
-        crafting thoughtful, visually driven digital experiences.
+        I'm Felecia Kenton, a Software Engineering student at the University of the West Indies, Mona.
+        I build full-stack applications and design user-centred interfaces, with a genuine passion
+        for graphic design and photography.
       </p>
       <div className="space-y-3">
         {[
-          { num: '11+', label: 'Years of experience' },
-          { num: '60+', label: 'Clients worldwide' },
-          { num: '100+', label: 'Projects delivered' },
-          { num: '97%', label: 'Client satisfaction rate' },
+          { num: '3+',   label: 'Years building software' },
+          { num: '5+',   label: 'Years in graphic design' },
+          { num: '2',    label: 'Years in photography' },
+          { num: '2026', label: 'Expected graduation' },
         ].map(({ num, label }) => (
           <div key={label} className="flex items-baseline gap-2">
             <span className="text-lg font-medium text-white">{num}</span>
@@ -139,16 +232,16 @@ function About() {
 
 const SERVICES = [
   {
-    title: 'Web Design',
-    items: ['Custom websites', 'Landing pages', 'UI/UX design', 'Website redesigns'],
+    title: 'Full-Stack Development',
+    items: ['React front-ends', 'FastAPI / Flask backends', 'REST & WebSocket APIs', 'PostgreSQL & Supabase databases', 'Docker containerisation'],
   },
   {
-    title: 'Branding',
-    items: ['Logo design', 'Visual identity systems', 'Brand guidelines', 'Style guides'],
+    title: 'UI/UX & Front-End',
+    items: ['Figma wireframes & prototypes', 'Responsive web interfaces', 'Data visualisation dashboards', 'Android apps (Android Studio)'],
   },
   {
-    title: 'Graphic Design',
-    items: ['Marketing materials', 'Social media graphics', 'Presentation design', 'Print design', 'Digital assets'],
+    title: 'Graphic Design & Photography',
+    items: ['Posters, flyers & social graphics', 'Brand identity & newsletters', 'Professional portrait photography', 'Print & digital assets'],
   },
 ]
 
@@ -175,28 +268,33 @@ function Services() {
 }
 
 const STACK = [
-  { name: 'Framer',      role: 'Web design',         color: '#0055FF' },
-  { name: 'Figma',       role: 'General Design Tool', color: '#F24E1E' },
-  { name: 'Photoshop',   role: 'Image editing',       color: '#001D34' },
-  { name: 'Illustrator', role: 'Graphic design',      color: '#FF7C00' },
-  { name: 'Midjourney',  role: 'Assets generation',   color: '#ffffff' },
-  { name: 'Spline',      role: '3D design',           color: '#1ABCFE' },
+  { name: 'React',      role: 'Front-end framework',        icon: 'react/react-original' },
+  { name: 'FastAPI',    role: 'Backend / REST APIs',        icon: 'fastapi/fastapi-original' },
+  { name: 'PostgreSQL', role: 'Relational database',        icon: 'postgresql/postgresql-original' },
+  { name: 'Python',     role: 'Backend & scripting',        icon: 'python/python-original' },
+  { name: 'Docker',     role: 'Containerisation',           icon: 'docker/docker-original' },
+  { name: 'Figma',      role: 'UI/UX & prototyping',        icon: 'figma/figma-original' },
+  { name: 'Kotlin',     role: 'Android development',        icon: 'kotlin/kotlin-original' },
+  { name: 'Arduino',    role: 'Embedded systems',           icon: 'arduino/arduino-original' },
+  { name: 'TypeScript', role: 'Typed JavaScript',           icon: 'typescript/typescript-original' },
+  { name: 'Flutter',    role: 'Cross-platform mobile',      icon: 'flutter/flutter-original' },
+  { name: 'Java',       role: 'Object-oriented development', icon: 'java/java-original' },
 ]
 
 function Stack() {
   return (
     <div>
       <SectionTitle>Stack.</SectionTitle>
-      <div className="space-y-4">
-        {STACK.map(({ name, role, color }) => (
-          <div key={name} className="flex items-center gap-4">
-            <div
-              className="w-9 h-9 rounded-lg flex-shrink-0"
-              style={{ background: `${color}22`, border: `1px solid ${color}44` }}
-            >
-              <div className="w-full h-full rounded-lg flex items-center justify-center">
-                <span className="text-xs font-bold" style={{ color }}>{name[0]}</span>
-              </div>
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+        {STACK.map(({ name, role, icon }) => (
+          <div key={name} className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg flex-shrink-0 bg-[#1e1e1e] border border-[#353534] flex items-center justify-center">
+              <img
+                src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${icon}.svg`}
+                alt={name}
+                width={22}
+                height={22}
+              />
             </div>
             <div>
               <p className="text-sm font-medium text-white leading-none">{name}</p>
@@ -211,28 +309,28 @@ function Stack() {
 
 const EXPERIENCE = [
   {
-    title: 'Senior Digital Designer',
-    company: 'Freelance',
-    period: '2019 – Present',
-    desc: 'Working with startups, agencies, and brands to design digital experiences that balance aesthetics and usability.',
+    title: 'Graphic Designer & Photographer',
+    company: 'FelecityArt (Self-Employed)',
+    period: 'Jul 2024 – Present',
+    desc: 'Managed multiple concurrent client projects delivering graphics, posters, flyers, and professional portrait photography for various clients and committees.',
   },
   {
-    title: 'Digital Designer',
-    company: 'Creative Studio',
-    period: '2015 — 2019',
-    desc: 'Designed modern websites and brand visuals, collaborating with developers and creatives to deliver cohesive digital experiences across multiple platforms.',
+    title: 'BSc Software Engineering',
+    company: 'University of the West Indies',
+    period: 'Sep 2022 – Sep 2026',
+    desc: 'Relevant coursework: Database Management, Netcentric Computing, Android Development, Digital Electronics & Circuits, Project Management, Formal Methods & Software Reliability, Software Testing.',
   },
   {
-    title: 'Graphic Designer',
-    company: 'Media Agency',
-    period: '2012 — 2015',
-    desc: 'Produced motion graphics, animations, and edited video content for marketing campaigns, social media, and promotional projects.',
+    title: 'Publications Committee Chairperson',
+    company: 'Physics Subcommittee, UWI',
+    period: '2023 – 2024',
+    desc: 'Designed promotional materials and the official Physics Newsletter; created the subcommittee uniform and advised on branding strategy.',
   },
   {
-    title: 'Junior Web Designer',
-    company: 'Design Agency',
-    period: '2010 — 2012',
-    desc: 'Supported website design projects, created visual assets, and assisted in building responsive layouts while developing a strong foundation in digital design.',
+    title: 'Technical Support Operator',
+    company: 'Astra Technology',
+    period: 'May 2022 – Aug 2022',
+    desc: 'Configured and programmed router and cable boxes for customer deployments and provided phone-based technical support to guide customers through device setup.',
   },
 ]
 
@@ -319,21 +417,19 @@ function ReachOut() {
         Let's work together to bring your ideas to life.
       </p>
       <div className="space-y-2 mb-6">
-        <a href="mailto:hello@kimadavidson.com" className="block text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">
-          hello@kimadavidson.com
+        <a href="mailto:kentonfelecia123@gmail.com" className="block text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">
+          kentonfelecia123@gmail.com
         </a>
-        <a href="tel:+11234567890" className="block text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">
-          (123) 456 7890
+        <a href="tel:+18763848711" className="block text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">
+          876-384-8711
         </a>
       </div>
       <div className="flex gap-4 mb-12">
-        {['Twitter/X', 'LinkedIn', 'Instagram'].map((s) => (
-          <a key={s} href="#" className="text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">{s}</a>
-        ))}
+        <a href="https://linkedin.com/in/felecia-kenton" target="_blank" rel="noreferrer" className="text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">LinkedIn</a>
+        <a href="https://github.com/FelecityArt" target="_blank" rel="noreferrer" className="text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">GitHub</a>
       </div>
       <div className="border-t border-[#353534] pt-6 space-y-1">
-        <p className="text-[#8e9192] text-xs">Designed in Framer By Thaer</p>
-        <p className="text-[#8e9192] text-xs">© 2025 All rights reserved</p>
+        <p className="text-[#8e9192] text-xs">© 2026 Felecia Kenton. All rights reserved.</p>
       </div>
     </div>
   )
@@ -364,43 +460,137 @@ function Sidebar() {
 
 /* ─── Gallery ─────────────────────────────────────────────── */
 const GALLERY_ITEMS = [
-  { src: IMG_PORTRAIT, alt: 'Editorial Series',      label: 'Editorial Series',      ratio: '3/4'  },
-  { src: IMG_VASE,     alt: 'Visual Identity',        label: 'Visual Identity',        ratio: '3/4'  },
-  { src: IMG_CITY,     alt: 'City Series',            label: 'City Series',            ratio: '4/5'  },
-  { src: IMG_MISC,     alt: 'Interaction Design',     label: 'Interaction Design',     ratio: '4/3'  },
-  { src: IMG_FABRIC,   alt: 'New Perspective',        label: 'New Perspective',        ratio: '2/3'  },
-  { src: IMG_FASHION,  alt: 'Motion Study',           label: 'Motion Study',           ratio: '2/3'  },
-  { src: IMG_PROJ1,    alt: 'Scarlet Design Studio',  label: 'Scarlet Design Studio®', ratio: '4/3'  },
-  { src: IMG_CAN,      alt: 'Product Design',         label: 'Product Design',         ratio: '1/1'  },
-  { src: IMG_PROJ2,    alt: 'Averra Studio',          label: 'Averra — Studio®',       ratio: '4/3'  },
-  { src: IMG_CAR,      alt: 'Brand Campaign',         label: 'Brand Campaign',         ratio: '16/9' },
-  { src: IMG_PROJ3,    alt: 'EIZO MORI',              label: 'EIZO MORI',              ratio: '3/4'  },
+  { src: IMG_PORTRAIT, alt: 'Editorial Series',     label: 'Editorial Series',      ratio: '3/4',  desc: 'A curated editorial series exploring texture, light, and form across analog and digital mediums.',        year: '2023', scope: 'Photography',    client: 'Self-initiated',  duration: '4 weeks' },
+  { src: IMG_VASE,     alt: 'Visual Identity',      label: 'Visual Identity',       ratio: '3/4',  desc: 'Complete brand identity system including logo, typography, colour palette, and usage guidelines.',         year: '2023', scope: 'Branding',        client: 'Studio Noma',     duration: '6 weeks' },
+  { src: IMG_CITY,     alt: 'City Series',          label: 'City Series',           ratio: '4/5',  desc: 'Urban documentary series capturing the quiet geometry of city infrastructure at dawn.',                    year: '2022', scope: 'Photography',    client: 'Self-initiated',  duration: '8 weeks' },
+  { src: IMG_MISC,     alt: 'Interaction Design',   label: 'Interaction Design',    ratio: '4/3',  desc: 'Micro-interaction design system built for a fintech dashboard — focused on clarity and motion.',           year: '2023', scope: 'UI/UX Design',    client: 'Vesper Finance',  duration: '10 weeks' },
+  { src: IMG_FABRIC,   alt: 'New Perspective',      label: 'New Perspective',       ratio: '2/3',  desc: 'A campaign exploring sustainable fashion through striking close-up photography and minimal layout.',        year: '2022', scope: 'Graphic Design',  client: 'Atelier Lune',    duration: '3 weeks' },
+  { src: IMG_FASHION,  alt: 'Motion Study',         label: 'Motion Study',          ratio: '2/3',  desc: 'Motion graphics package created for a luxury fashion week campaign across digital and print.',             year: '2023', scope: 'Motion Design',   client: 'Maison Voss',     duration: '5 weeks' },
+  { src: IMG_PROJ1,    alt: 'Scarlet Design Studio',label: 'Scarlet Design Studio®',ratio: '4/3',  desc: 'Full website redesign and brand refresh for a creative studio. Focused on bold typography and space.',     year: '2023', scope: 'Web Design',      client: 'Scarlet Studio',  duration: '8 weeks' },
+  { src: IMG_CAN,      alt: 'Product Design',       label: 'Product Design',        ratio: '1/1',  desc: 'Packaging and product design for a premium beverage brand entering the European market.',                  year: '2022', scope: 'Product Design',  client: 'Orla Drinks Co.', duration: '6 weeks' },
+  { src: IMG_PROJ2,    alt: 'Averra Studio',        label: 'Averra — Studio®',      ratio: '4/3',  desc: 'Brand identity and web presence for an architecture studio with a focus on minimal, spatial design.',      year: '2023', scope: 'Branding',        client: 'Averra Studio',   duration: '7 weeks' },
+  { src: IMG_CAR,      alt: 'Brand Campaign',       label: 'Brand Campaign',        ratio: '16/9', desc: 'Campaign visuals and social graphics for a product launch targeting design-forward early adopters.',        year: '2024', scope: 'Graphic Design',  client: 'Pulse Agency',    duration: '6 weeks' },
+  { src: IMG_PROJ3,    alt: 'EIZO MORI',            label: 'EIZO MORI',             ratio: '3/4',  desc: 'Visual identity and lookbook design for an independent menswear label rooted in Japanese minimalism.',     year: '2024', scope: 'Branding',        client: 'EIZO MORI',       duration: '9 weeks' },
 ]
 
-function Gallery() {
+function Lightbox({ image, onClose, onPrev, onNext }) {
+  React.useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') onPrev()
+      if (e.key === 'ArrowRight') onNext()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose, onPrev, onNext])
+
   return (
-    <main className="flex-1 h-full overflow-y-auto no-scrollbar bg-[#121212] p-4 md:p-5">
-      {/* CSS columns gives true masonry — equal gap between every item regardless of height */}
-      <div style={{ columns: 2, columnGap: '1rem' }}>
-        {GALLERY_ITEMS.map(({ src, alt, label, ratio }) => (
-          <div key={alt} style={{ breakInside: 'avoid', marginBottom: '1rem' }}>
-            <div
-              className="rounded-xl overflow-hidden group relative w-full"
-              style={{ aspectRatio: ratio }}
-            >
-              <img
-                src={src}
-                alt={alt}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-5">
-                <span className="text-xs uppercase tracking-widest font-medium text-white">{label}</span>
+    <div className="fixed inset-0 z-50 flex flex-col md:flex-row" style={{ backgroundColor: '#121212' }}>
+
+      {/* ── Left info panel ── */}
+      <div className="w-full md:w-[320px] lg:w-[380px] flex-shrink-0 flex flex-col overflow-y-auto no-scrollbar p-8 md:p-10 lg:p-14">
+        {/* Back */}
+        <button
+          onClick={onClose}
+          className="flex items-center justify-center text-[#e5e2e1] bg-[#1e1e1e] hover:bg-[#2a2a2a] transition-colors rounded-full w-9 h-9 text-lg mb-10"
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+        {/* Title + description */}
+        <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4 leading-tight">{image.label}</h2>
+        <p className="text-[#8e9192] text-sm leading-relaxed mb-8">{image.desc}</p>
+
+        {/* Divider */}
+        <div className="border-t border-[#353534] mb-8" />
+
+        {/* Metadata */}
+        <div className="space-y-3">
+          {[
+            { key: 'Year',     val: image.year     },
+            { key: 'Scope',    val: image.scope    },
+            { key: 'Client',   val: image.client   },
+            { key: 'Duration', val: image.duration },
+          ].map(({ key, val }) => (
+            <div key={key} className="flex items-baseline gap-3">
+              <span className="text-[#8e9192] text-sm w-20 flex-shrink-0">{key}</span>
+              <span className="text-[#353534] text-xs">•</span>
+              <span className="text-white text-sm font-medium">{val}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Spacer + nav arrows at bottom */}
+        <div className="mt-auto pt-10 flex items-center gap-4">
+          <button
+            onClick={onPrev}
+            className="w-9 h-9 rounded-full border border-[#353534] flex items-center justify-center text-[#8e9192] hover:text-white hover:border-white transition-colors text-sm"
+            aria-label="Previous"
+          >←</button>
+          <button
+            onClick={onNext}
+            className="w-9 h-9 rounded-full border border-[#353534] flex items-center justify-center text-[#8e9192] hover:text-white hover:border-white transition-colors text-sm"
+            aria-label="Next"
+          >→</button>
+        </div>
+      </div>
+
+      {/* ── Right image panel ── */}
+      <div
+        className="flex-1 overflow-hidden relative"
+        onClick={onClose}
+      >
+        <img
+          src={image.src}
+          alt={image.alt}
+          onClick={(e) => e.stopPropagation()}
+          className="w-full h-full object-contain"
+        />
+      </div>
+
+    </div>
+  )
+}
+
+function Gallery() {
+  const [selectedIdx, setSelectedIdx] = React.useState(null)
+  const total = GALLERY_ITEMS.length
+
+  return (
+    <>
+      <main className="flex-1 h-full overflow-y-auto no-scrollbar bg-[#121212] p-4 md:p-5">
+        {/* CSS columns gives true masonry — equal gap between every item regardless of height */}
+        <div style={{ columns: 2, columnGap: '1rem' }}>
+          {GALLERY_ITEMS.map(({ src, alt, label, ratio }, idx) => (
+            <div key={alt} style={{ breakInside: 'avoid', marginBottom: '1rem' }}>
+              <div
+                className="rounded-xl overflow-hidden group relative w-full cursor-pointer"
+                style={{ aspectRatio: ratio }}
+                onClick={() => setSelectedIdx(idx)}
+              >
+                <img
+                  src={src}
+                  alt={alt}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-5">
+                  <span className="text-xs uppercase tracking-widest font-medium text-white">{label}</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </main>
+          ))}
+        </div>
+      </main>
+      {selectedIdx !== null && (
+        <Lightbox
+          image={GALLERY_ITEMS[selectedIdx]}
+          onClose={() => setSelectedIdx(null)}
+          onPrev={() => setSelectedIdx((selectedIdx - 1 + total) % total)}
+          onNext={() => setSelectedIdx((selectedIdx + 1) % total)}
+        />
+      )}
+    </>
   )
 }
 
