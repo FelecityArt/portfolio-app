@@ -378,7 +378,7 @@ const TESTIMONIALS = [
   {
     name: 'Kimano Lambert',
     role: 'NOC Engineer',
-    quote: 'Felecia has a knack for converting ideas into beautiful images, I love the work she does!',
+    quote: "Felecia is skillful at converting designs and ideas into functional prototypes and full-stack applications. It's a blast working with her!",
     avatar: kimPic,
   },
 ]
