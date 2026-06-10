@@ -648,6 +648,8 @@ const GALLERY_ITEMS = [
 ]
 
 function Lightbox({ image, onClose, onPrev, onNext }) {
+  const [expanded, setExpanded] = React.useState(false)
+
   React.useEffect(() => {
     const handler = (e) => {
       if (e.key === 'Escape') onClose()
@@ -717,10 +719,30 @@ function Lightbox({ image, onClose, onPrev, onNext }) {
         <img
           src={image.src}
           alt={image.alt}
-          onClick={(e) => e.stopPropagation()}
-          className="w-full h-full object-contain"
+          onClick={(e) => { e.stopPropagation(); setExpanded(true) }}
+          className="w-full h-full object-contain cursor-zoom-in"
         />
       </div>
+
+      {/* ── Expanded fullscreen view ── */}
+      {expanded && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95"
+          onClick={() => setExpanded(false)}
+        >
+          <img
+            src={image.src}
+            alt={image.alt}
+            className="max-w-full max-h-full object-contain select-none"
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+          <button
+            className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#1e1e1e] text-white flex items-center justify-center text-lg"
+            onClick={() => setExpanded(false)}
+            aria-label="Close fullscreen"
+          >×</button>
+        </div>
+      )}
 
     </div>
   )
