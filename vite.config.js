@@ -12,7 +12,7 @@ export default defineConfig({
     alias: [
       {
         find: 'smooth-scroll',
-        replacement: path.resolve(__dirname, '../Smooth Scroll'),
+        replacement: path.resolve(__dirname, './packages/smooth-scroll'),
       },
       // Force all bare react/lenis/framer-motion imports from outside the
       // project root (i.e. Smooth Scroll components) to resolve from THIS

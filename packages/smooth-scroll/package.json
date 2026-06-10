@@ -1,0 +1,178 @@
+{
+  "name": "Smooth Scroll",
+  "version": "1.0.0",
+  "description": "Exported Framer components: SmoothscrollProd, Phone, Scrollprogress, Primary, Stats, Stats2, Stats3, Stats4, Service, Service2, Service3, CardsStack, CardsStack2, CardsStack3, CardsStack4, CardsStack5, CardsStack6, Experience, Experience2, Experience3, Experience4, Award, Award2, Award3, Award4, Award5, Testimonial, Testimonial2, Testimonial3, Testimonial4, Footer, Scrollprogress2, Project, O, Primary2, BackToTop, Wvoxr23zi, Wvoxr23zi2",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./SmoothscrollProd": {
+      "import": "./SmoothscrollProd.js",
+      "types": "./SmoothscrollProd.d.ts"
+    },
+    "./Phone": {
+      "import": "./Phone.js",
+      "types": "./Phone.d.ts"
+    },
+    "./Scrollprogress": {
+      "import": "./Scrollprogress.js",
+      "types": "./Scrollprogress.d.ts"
+    },
+    "./Primary": {
+      "import": "./Primary.js",
+      "types": "./Primary.d.ts"
+    },
+    "./Stats": {
+      "import": "./Stats.js",
+      "types": "./Stats.d.ts"
+    },
+    "./Stats2": {
+      "import": "./Stats2.js",
+      "types": "./Stats2.d.ts"
+    },
+    "./Stats3": {
+      "import": "./Stats3.js",
+      "types": "./Stats3.d.ts"
+    },
+    "./Stats4": {
+      "import": "./Stats4.js",
+      "types": "./Stats4.d.ts"
+    },
+    "./Service": {
+      "import": "./Service.js",
+      "types": "./Service.d.ts"
+    },
+    "./Service2": {
+      "import": "./Service2.js",
+      "types": "./Service2.d.ts"
+    },
+    "./Service3": {
+      "import": "./Service3.js",
+      "types": "./Service3.d.ts"
+    },
+    "./CardsStack": {
+      "import": "./CardsStack.js",
+      "types": "./CardsStack.d.ts"
+    },
+    "./CardsStack2": {
+      "import": "./CardsStack2.js",
+      "types": "./CardsStack2.d.ts"
+    },
+    "./CardsStack3": {
+      "import": "./CardsStack3.js",
+      "types": "./CardsStack3.d.ts"
+    },
+    "./CardsStack4": {
+      "import": "./CardsStack4.js",
+      "types": "./CardsStack4.d.ts"
+    },
+    "./CardsStack5": {
+      "import": "./CardsStack5.js",
+      "types": "./CardsStack5.d.ts"
+    },
+    "./CardsStack6": {
+      "import": "./CardsStack6.js",
+      "types": "./CardsStack6.d.ts"
+    },
+    "./Experience": {
+      "import": "./Experience.js",
+      "types": "./Experience.d.ts"
+    },
+    "./Experience2": {
+      "import": "./Experience2.js",
+      "types": "./Experience2.d.ts"
+    },
+    "./Experience3": {
+      "import": "./Experience3.js",
+      "types": "./Experience3.d.ts"
+    },
+    "./Experience4": {
+      "import": "./Experience4.js",
+      "types": "./Experience4.d.ts"
+    },
+    "./Award": {
+      "import": "./Award.js",
+      "types": "./Award.d.ts"
+    },
+    "./Award2": {
+      "import": "./Award2.js",
+      "types": "./Award2.d.ts"
+    },
+    "./Award3": {
+      "import": "./Award3.js",
+      "types": "./Award3.d.ts"
+    },
+    "./Award4": {
+      "import": "./Award4.js",
+      "types": "./Award4.d.ts"
+    },
+    "./Award5": {
+      "import": "./Award5.js",
+      "types": "./Award5.d.ts"
+    },
+    "./Testimonial": {
+      "import": "./Testimonial.js",
+      "types": "./Testimonial.d.ts"
+    },
+    "./Testimonial2": {
+      "import": "./Testimonial2.js",
+      "types": "./Testimonial2.d.ts"
+    },
+    "./Testimonial3": {
+      "import": "./Testimonial3.js",
+      "types": "./Testimonial3.d.ts"
+    },
+    "./Testimonial4": {
+      "import": "./Testimonial4.js",
+      "types": "./Testimonial4.d.ts"
+    },
+    "./Footer": {
+      "import": "./Footer.js",
+      "types": "./Footer.d.ts"
+    },
+    "./Scrollprogress2": {
+      "import": "./Scrollprogress2.js",
+      "types": "./Scrollprogress2.d.ts"
+    },
+    "./Project": {
+      "import": "./Project.js",
+      "types": "./Project.d.ts"
+    },
+    "./O": {
+      "import": "./O.js",
+      "types": "./O.d.ts"
+    },
+    "./Primary2": {
+      "import": "./Primary2.js",
+      "types": "./Primary2.d.ts"
+    },
+    "./BackToTop": {
+      "import": "./BackToTop.js",
+      "types": "./BackToTop.d.ts"
+    },
+    "./Wvoxr23zi": {
+      "import": "./Wvoxr23zi.js",
+      "types": "./Wvoxr23zi.d.ts"
+    },
+    "./Wvoxr23zi2": {
+      "import": "./Wvoxr23zi2.js",
+      "types": "./Wvoxr23zi2.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "framer-motion": ">=10.0.0"
+  },
+  "keywords": [
+    "framer",
+    "react",
+    "components",
+    "exported"
+  ],
+  "license": "MIT"
+}

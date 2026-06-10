@@ -31,7 +31,6 @@ export default function DotField() {
   const mouseRef = useRef(null)   // { x, y } or null
   const rafRef = useRef(null)
   const frameRef = useRef(0)
-  const idleTimerRef = useRef(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -124,17 +123,10 @@ export default function DotField() {
     function onMouseMove(e) {
       mouseRef.current = { x: e.clientX, y: e.clientY }
       startLoop()
-      // Stop loop 150ms after last mouse movement
-      clearTimeout(idleTimerRef.current)
-      idleTimerRef.current = setTimeout(() => {
-        stopLoop()
-        draw() // one final draw to show dots back at rest
-      }, 150)
     }
 
     function onMouseLeave() {
       mouseRef.current = null
-      clearTimeout(idleTimerRef.current)
       stopLoop()
       draw()
     }
@@ -150,7 +142,6 @@ export default function DotField() {
 
     return () => {
       stopLoop()
-      clearTimeout(idleTimerRef.current)
       window.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseleave', onMouseLeave)
       ro.disconnect()
