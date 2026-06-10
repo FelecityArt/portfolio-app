@@ -3,7 +3,19 @@ import './index.css'
 import DotField from './DotField'
 import { motion, useAnimationFrame, useMotionValue } from 'framer-motion'
 import emailjs from '@emailjs/browser'
-import myPic from './assets/images/my_pic.png'
+import myPic from './assets/images/my_pic.jpg'
+import kimPic from './assets/images/kimPic.JPG'
+import REFLECTION from './assets/images/reflection.jpg'
+import FRIENDSHIP from './assets/images/friendship.jpg'
+import STILL from './assets/images/still.JPG'
+import INSPIRED from './assets/images/inspired.jpg'
+import GRAPHICTS from './assets/images/graphicTs.jpg'
+import BOARDWALK from './assets/images/boardwalk.jpg'
+import BRAINBASH from './assets/images/brainbash.png'
+import MEDSIM from './assets/images/medsim.jpg'
+import GIRLSNIGHT from './assets/images/friends.jpg'
+import ARTMOSPHERE from './assets/images/artmosphere.png'
+import HALLOWEEN from './assets/images/halloween.jpg'
 
 /* ─── Image constants ─────────────────────────────────────── */
 const AVATAR      = myPic
@@ -23,11 +35,6 @@ const IMG_PROJ1    = 'https://images.unsplash.com/photo-1547658719-da2b51169166?
 const IMG_PROJ2    = 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=900&fit=crop&auto=format&q=80&sat=-100'
 const IMG_PROJ3    = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&fit=crop&auto=format&q=80&sat=-100'
 
-/* Testimonial avatars */
-const AVT_EMILY    = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&auto=format&q=80&sat=-100'
-const AVT_DANIEL   = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&auto=format&q=80&sat=-100'
-const AVT_MICHAEL  = 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=80&h=80&fit=crop&auto=format&q=80&sat=-100'
-const AVT_SARAH    = 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&fit=crop&auto=format&q=80&sat=-100'
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 function compressImage(file, maxBytes = 30_000) {
@@ -59,7 +66,7 @@ function compressImage(file, maxBytes = 30_000) {
 
 /* ─── Reusable components ─────────────────────────────────── */
 function Divider() {
-  return <div className="border-t border-[#353534] my-10" style={{ marginRight: '-3rem' }} />
+  return <div className="border-t border-[#353534] my-10" />
 }
 
 function SectionTitle({ children }) {
@@ -72,7 +79,7 @@ function GalleryImage({ src, alt, label, className = '' }) {
       <img
         src={src}
         alt={alt}
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-[filter] duration-700 ease-in-out"
       />
       {label && (
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-5">
@@ -198,7 +205,7 @@ function ClientLogos() {
   })
 
   return (
-    <div style={{ borderTop: '1px solid #353534', borderBottom: '1px solid #353534', marginBottom: '56px', marginTop: '8px', marginRight: '-3rem' }}>
+    <div style={{ borderTop: '1px solid #353534', borderBottom: '1px solid #353534', marginBottom: '56px', marginTop: '8px' }}>
       <div style={{ overflow: 'hidden', paddingTop: '60px', paddingBottom: '60px', maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)' }}>
         <motion.div style={{ x, display: 'flex', whiteSpace: 'nowrap' }}>
           <div ref={groupRef} style={{ display: 'flex', flexShrink: 0 }}>
@@ -365,30 +372,14 @@ function Experience() {
   )
 }
 
+// To add a testimonial: { name, role, quote, avatar }
+// avatar: import from ./assets/images/ or leave as '' for initials fallback
 const TESTIMONIALS = [
   {
-    name: 'Emily T',
-    role: 'Product Manager',
-    avatar: AVT_EMILY,
-    quote: '"Kima brings creativity, clarity, and professionalism to every project. Her ability to combine design, motion, and video made a real difference for our launch."',
-  },
-  {
-    name: 'Daniel R.',
-    role: 'Founder',
-    avatar: AVT_DANIEL,
-    quote: '"Working with Kima was smooth from start to finish. She translated our ideas into a clean, modern website that truly represents our brand."',
-  },
-  {
-    name: 'Michael K.',
-    role: 'Creative Lead',
-    avatar: AVT_MICHAEL,
-    quote: '"Reliable, thoughtful, and highly skilled. Kima consistently delivered high-quality work on time and was great to collaborate with."',
-  },
-  {
-    name: 'Sarah M.',
-    role: 'Marketing Director',
-    avatar: AVT_SARAH,
-    quote: '"Kima has an incredible eye for detail and a clear understanding of how design should function, not just look good. The final result exceeded our expectations."',
+    name: 'Kimano Lambert',
+    role: 'NOC Engineer',
+    quote: 'Felecia has a knack for converting ideas into beautiful images, I love the work she does!',
+    avatar: kimPic,
   },
 ]
 
@@ -550,24 +541,34 @@ function Testimonials() {
   return (
     <div>
       <SectionTitle>Testimonials.</SectionTitle>
-      <div className="space-y-8">
-        {TESTIMONIALS.map(({ name, role, avatar, quote }) => (
-          <div key={name} className="flex gap-4">
-            <img
-              src={avatar}
-              alt={name}
-              className="w-10 h-10 rounded-lg object-cover flex-shrink-0 mt-0.5 grayscale"
-            />
-            <div>
-              <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-sm font-medium text-white">{name}</span>
-                <span className="text-[#8e9192] text-xs">• {role}</span>
+      {TESTIMONIALS.length > 0 ? (
+        <div className="space-y-8">
+          {TESTIMONIALS.map(({ name, role, avatar, quote }) => (
+            <div key={name} className="flex gap-4">
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt={name}
+                  className="w-10 h-10 rounded-lg object-cover flex-shrink-0 mt-0.5 grayscale"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-lg flex-shrink-0 mt-0.5 bg-[#353534] flex items-center justify-center text-white text-sm font-medium select-none">
+                  {name.split(' ').map(w => w[0]).slice(0, 2).join('')}
+                </div>
+              )}
+              <div>
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-sm font-medium text-white">{name}</span>
+                  <span className="text-[#8e9192] text-xs">• {role}</span>
+                </div>
+                <p className="text-[#8e9192] text-sm leading-relaxed">"{quote}"</p>
               </div>
-              <p className="text-[#8e9192] text-sm leading-relaxed">{quote}</p>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-[#8e9192] text-sm leading-relaxed mb-2">No testimonials yet — be the first.</p>
+      )}
       <button
         onClick={() => setShowForm(true)}
         className="mt-6 text-xs text-[#8e9192] underline underline-offset-2 hover:text-white transition-colors"
@@ -595,7 +596,7 @@ function ReachOut() {
         </a>
       </div>
       <div className="flex gap-4 mb-12">
-        <a href="https://linkedin.com/in/felecia-kenton" target="_blank" rel="noreferrer" className="text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">LinkedIn</a>
+        <a href="https://www.linkedin.com/in/felecityart/" target="_blank" rel="noreferrer" className="text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">LinkedIn</a>
         <a href="https://github.com/FelecityArt" target="_blank" rel="noreferrer" className="text-white text-sm underline underline-offset-2 hover:text-[#8e9192] transition-colors">GitHub</a>
       </div>
       <div className="border-t border-[#353534] pt-6 space-y-1">
@@ -607,7 +608,7 @@ function ReachOut() {
 
 function Sidebar() {
   return (
-    <aside className="w-full md:w-[460px] lg:w-[520px] flex-shrink-0 h-full overflow-y-auto no-scrollbar bg-[#121212] p-8 md:p-10 lg:p-14 flex flex-col">
+    <aside className="w-full md:w-[460px] lg:w-[520px] flex-shrink-0 md:h-full overflow-y-auto no-scrollbar bg-[#121212] p-8 md:p-10 lg:p-14 flex flex-col">
       <ProfileHeader />
       <Bio />
       <Availability />
@@ -620,27 +621,30 @@ function Sidebar() {
       <Stack />
       <Divider />
       <Experience />
-      <Divider />
-      <Testimonials />
-      <Divider />
-      <ReachOut />
+      {/* On desktop, testimonials + footer live here inside the scrollable aside */}
+      <div className="hidden md:flex md:flex-col">
+        <Divider />
+        <Testimonials />
+        <Divider />
+        <ReachOut />
+      </div>
     </aside>
   )
 }
 
 /* ─── Gallery ─────────────────────────────────────────────── */
 const GALLERY_ITEMS = [
-  { src: IMG_PORTRAIT, alt: 'Editorial Series',     label: 'Editorial Series',      ratio: '3/4',  desc: 'A curated editorial series exploring texture, light, and form across analog and digital mediums.',        year: '2023', scope: 'Photography',    client: 'Self-initiated',  duration: '4 weeks' },
-  { src: IMG_VASE,     alt: 'Visual Identity',      label: 'Visual Identity',       ratio: '3/4',  desc: 'Complete brand identity system including logo, typography, colour palette, and usage guidelines.',         year: '2023', scope: 'Branding',        client: 'Studio Noma',     duration: '6 weeks' },
-  { src: IMG_CITY,     alt: 'City Series',          label: 'City Series',           ratio: '4/5',  desc: 'Urban documentary series capturing the quiet geometry of city infrastructure at dawn.',                    year: '2022', scope: 'Photography',    client: 'Self-initiated',  duration: '8 weeks' },
-  { src: IMG_MISC,     alt: 'Interaction Design',   label: 'Interaction Design',    ratio: '4/3',  desc: 'Micro-interaction design system built for a fintech dashboard — focused on clarity and motion.',           year: '2023', scope: 'UI/UX Design',    client: 'Vesper Finance',  duration: '10 weeks' },
-  { src: IMG_FABRIC,   alt: 'New Perspective',      label: 'New Perspective',       ratio: '2/3',  desc: 'A campaign exploring sustainable fashion through striking close-up photography and minimal layout.',        year: '2022', scope: 'Graphic Design',  client: 'Atelier Lune',    duration: '3 weeks' },
-  { src: IMG_FASHION,  alt: 'Motion Study',         label: 'Motion Study',          ratio: '2/3',  desc: 'Motion graphics package created for a luxury fashion week campaign across digital and print.',             year: '2023', scope: 'Motion Design',   client: 'Maison Voss',     duration: '5 weeks' },
-  { src: IMG_PROJ1,    alt: 'Scarlet Design Studio',label: 'Scarlet Design Studio®',ratio: '4/3',  desc: 'Full website redesign and brand refresh for a creative studio. Focused on bold typography and space.',     year: '2023', scope: 'Web Design',      client: 'Scarlet Studio',  duration: '8 weeks' },
-  { src: IMG_CAN,      alt: 'Product Design',       label: 'Product Design',        ratio: '1/1',  desc: 'Packaging and product design for a premium beverage brand entering the European market.',                  year: '2022', scope: 'Product Design',  client: 'Orla Drinks Co.', duration: '6 weeks' },
-  { src: IMG_PROJ2,    alt: 'Averra Studio',        label: 'Averra — Studio®',      ratio: '4/3',  desc: 'Brand identity and web presence for an architecture studio with a focus on minimal, spatial design.',      year: '2023', scope: 'Branding',        client: 'Averra Studio',   duration: '7 weeks' },
-  { src: IMG_CAR,      alt: 'Brand Campaign',       label: 'Brand Campaign',        ratio: '16/9', desc: 'Campaign visuals and social graphics for a product launch targeting design-forward early adopters.',        year: '2024', scope: 'Graphic Design',  client: 'Pulse Agency',    duration: '6 weeks' },
-  { src: IMG_PROJ3,    alt: 'EIZO MORI',            label: 'EIZO MORI',             ratio: '3/4',  desc: 'Visual identity and lookbook design for an independent menswear label rooted in Japanese minimalism.',     year: '2024', scope: 'Branding',        client: 'EIZO MORI',       duration: '9 weeks' },
+  { src: REFLECTION,   alt: 'REFLECTION',            label: 'REFLECTION',            ratio: '3/4',  desc: 'A portrait series exploring self-recognition, the small private moments where a person simply sees themselves.',                                                              year: '2025', scope: 'Photography',    client: 'Self-initiated',  },
+  { src: STILL,        alt: 'EDGES',                 label: 'EDGES',                 ratio: '3/4',  desc: 'Architecture as character study, the way a building can feel just as expressive as a face when you find the right angle.',                                                   year: '2024', scope: 'Photography',    client: 'Self-initiated',  },
+  { src: BOARDWALK,    alt: 'BOARDWALK IN VIRGINIA', label: 'BOARDWALK IN VIRGINIA', ratio: '4/5',  desc: 'A study in perspective and horizon, the particular stillness that only exists at the edge of land and open water.',                                                          year: '2024', scope: 'Photography',    client: 'Self-initiated',  },
+  { src: BRAINBASH,    alt: 'BRAINBASH',             label: 'BRAINBASH',             ratio: '4/3',  desc: 'Built around the belief that learning should feel like play, where competition and curiosity drive the classroom.',                        year: '2026', scope: 'Full-Stack Dev',  client: 'Capstone Project', },
+  { src: GIRLSNIGHT,   alt: 'GIRLS NIGHT',           label: 'GIRLS NIGHT',           ratio: '2/3',  desc: 'A document of candid joy, the kind of closeness that shows up naturally when you stop posing and just exist together.',                                                      year: '2025', scope: 'Photography',    client: 'Self-initiated',  },
+  { src: FRIENDSHIP,   alt: 'FRIENDSHIP',            label: 'FRIENDSHIP',            ratio: '4/3',  desc: 'About warmth in the truest sense, the kind that has nothing to do with the lights behind them and everything to do with who is in front of the lens.',                      year: '2025', scope: 'Photography',    client: 'Self-initiated',  },
+  { src: INSPIRED,     alt: 'INSPIRED',              label: 'INSPIRED',              ratio: '2/3',  desc: 'A portrait about chosen stillness, the quiet self-possession of someone fully present without needing to prove it.',                                                         year: '2024', scope: 'Photography',    client: 'Self-initiated',  },
+  { src: GRAPHICTS,    alt: 'GRAPHIC T-SHIRTS',      label: 'GRAPHIC T-SHIRTS',      ratio: '1/1',  objPos: 'top',  desc: 'Built for Artmosphere, my own brand, a project spanning graphic design, product design, and the full storefront, where clothing is treated as a surface worth taking seriously and every piece carries a point of view.',               year: '2023', scope: 'Design & Development',  client: 'Own Brand',  },
+  { src: HALLOWEEN,    alt: 'HALLOWEEN',             label: 'HALLOWEEN',             ratio: '4/3',  desc: 'Event design that understands a flyer is also a promise, built to make the night feel inevitable before it arrives.',                                                        year: '2024', scope: 'Graphic Design',  client: 'Cluster 8',       },
+  { src: MEDSIM,       alt: 'MEDSIM',                label: 'MEDSIM',                ratio: '16/9', desc: 'A web experience designed around a real constraint: bringing surgical training to the people who need it without requiring the infrastructure it usually demands.',            year: '2026', scope: 'UI/UX & Project Management',    client: 'MedSim',          },
+  { src: ARTMOSPHERE,  alt: 'ARTMOSPHERE',           label: 'ARTMOSPHERE',           ratio: '3/4',  desc: 'A storefront that opens with a point of view, built on the idea that fashion and art have always been the same conversation.',                                               year: '2023', scope: 'Graphic Design',  client: 'Own Brand',       },
 ]
 
 function Lightbox({ image, onClose, onPrev, onNext }) {
@@ -678,10 +682,9 @@ function Lightbox({ image, onClose, onPrev, onNext }) {
         {/* Metadata */}
         <div className="space-y-3">
           {[
-            { key: 'Year',     val: image.year     },
-            { key: 'Scope',    val: image.scope    },
-            { key: 'Client',   val: image.client   },
-            { key: 'Duration', val: image.duration },
+            { key: 'Year',   val: image.year   },
+            { key: 'Scope',  val: image.scope  },
+            { key: 'Client', val: image.client },
           ].map(({ key, val }) => (
             <div key={key} className="flex items-baseline gap-3">
               <span className="text-[#8e9192] text-sm w-20 flex-shrink-0">{key}</span>
@@ -729,10 +732,10 @@ function Gallery() {
 
   return (
     <>
-      <main className="flex-1 h-full overflow-y-auto no-scrollbar bg-[#121212] p-4 md:p-5">
+      <main className="w-full md:flex-1 md:h-full overflow-y-auto no-scrollbar bg-[#121212] p-4 md:p-5">
         {/* CSS columns gives true masonry — equal gap between every item regardless of height */}
         <div style={{ columns: 2, columnGap: '1rem' }}>
-          {GALLERY_ITEMS.map(({ src, alt, label, ratio }, idx) => (
+          {GALLERY_ITEMS.map(({ src, alt, label, ratio, objPos }, idx) => (
             <div key={alt} style={{ breakInside: 'avoid', marginBottom: '1rem' }}>
               <div
                 className="rounded-xl overflow-hidden group relative w-full cursor-pointer"
@@ -742,7 +745,8 @@ function Gallery() {
                 <img
                   src={src}
                   alt={alt}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-[filter] duration-700 ease-in-out"
+                  style={objPos ? { objectPosition: objPos } : undefined}
                 />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-5">
                   <span className="text-xs uppercase tracking-widest font-medium text-white">{label}</span>
@@ -767,10 +771,17 @@ function Gallery() {
 /* ─── Root ────────────────────────────────────────────────── */
 export default function App() {
   return (
-    <div className="flex flex-col md:flex-row h-screen w-full overflow-hidden bg-[#121212] font-sans antialiased relative">
+    <div className="flex flex-col md:flex-row md:h-screen w-full md:overflow-hidden bg-[#121212] font-sans antialiased relative">
       <DotField />
       <Sidebar />
       <Gallery />
+      {/* On mobile, testimonials + footer appear after the gallery */}
+      <div className="md:hidden bg-[#121212] px-8 pb-8 flex flex-col">
+        <Divider />
+        <Testimonials />
+        <Divider />
+        <ReachOut />
+      </div>
     </div>
   )
 }
