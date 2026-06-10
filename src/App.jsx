@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import './index.css'
 import DotField from './DotField'
 import { motion, useAnimationFrame, useMotionValue } from 'framer-motion'
@@ -770,8 +770,34 @@ function Gallery() {
 
 /* ─── Root ────────────────────────────────────────────────── */
 export default function App() {
+  const rootRef = useRef(null)
+
+  useEffect(() => {
+    let startX = 0
+    let startY = 0
+
+    function onTouchStart(e) {
+      startX = e.touches[0].clientX
+      startY = e.touches[0].clientY
+    }
+
+    function onTouchMove(e) {
+      const dx = Math.abs(e.touches[0].clientX - startX)
+      const dy = Math.abs(e.touches[0].clientY - startY)
+      if (dx > dy) e.preventDefault()
+    }
+
+    const el = rootRef.current
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove', onTouchMove)
+    }
+  }, [])
+
   return (
-    <div className="flex flex-col md:flex-row md:h-screen w-full md:overflow-hidden bg-[#121212] font-sans antialiased relative">
+    <div ref={rootRef} className="flex flex-col md:flex-row md:h-screen w-full md:overflow-hidden bg-[#121212] font-sans antialiased relative">
       <DotField />
       <Sidebar />
       <Gallery />
