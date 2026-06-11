@@ -131,19 +131,42 @@ export default function DotField() {
       draw()
     }
 
-    const ro = new ResizeObserver(resize)
+    function onTouchStart(e) {
+      const t = e.touches[0]
+      mouseRef.current = { x: t.clientX, y: t.clientY }
+      startLoop()
+    }
+
+    function onTouchMove(e) {
+      const t = e.touches[0]
+      mouseRef.current = { x: t.clientX, y: t.clientY }
+    }
+
+    function onTouchEnd() {
+      mouseRef.current = null
+      stopLoop()
+      draw()
+    }
+
+    const ro = new ResizeObserver(() => { resize(); if (!rafRef.current) draw() })
     ro.observe(document.documentElement)
 
     resize()
-    draw() // initial static render
+    draw()
 
     window.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseleave', onMouseLeave)
+    window.addEventListener('touchstart', onTouchStart, { passive: true })
+    window.addEventListener('touchmove', onTouchMove, { passive: true })
+    window.addEventListener('touchend', onTouchEnd)
 
     return () => {
       stopLoop()
       window.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseleave', onMouseLeave)
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('touchend', onTouchEnd)
       ro.disconnect()
     }
   }, [])
