@@ -15,7 +15,7 @@ body {
   color: #e5e2e1;
   overflow-x: hidden;
   max-width: 100vw;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   overscroll-behavior-x: none;
 }
 
