@@ -3,6 +3,7 @@ import './index.css'
 import DotField from './DotField'
 import { motion, useAnimationFrame, useMotionValue } from 'framer-motion'
 import emailjs from '@emailjs/browser'
+import { Analytics } from '@vercel/analytics/react'
 import myPic from './assets/images/my_pic.jpg'
 import kimPic from './assets/images/kimPic.JPG'
 import REFLECTION from './assets/images/reflection.jpg'
@@ -804,6 +805,7 @@ export default function App() {
         <Divider />
         <ReachOut />
       </div>
+      <Analytics />
     </div>
   )
 }
